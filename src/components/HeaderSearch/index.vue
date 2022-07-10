@@ -1,139 +1,164 @@
 <template>
-  <div :class="{ show: isShow }" class="header-search">
-    <svg-icon
-      id="guide-search"
-      class-name="search-icon"
-      icon="search"
-      @click.stop="onShowClick"
-    />
+  <div :class="{'show':show}" class="header-search">
+    <svg-icon class-name="search-icon" icon-class="search" @click.stop="click" />
     <el-select
-      ref="headerSearchSelectRef"
-      class="header-search-select"
+      ref="headerSearchSelect"
       v-model="search"
+      :remote-method="querySearch"
       filterable
       default-first-option
       remote
       placeholder="Search"
-      :remote-method="querySearch"
-      @change="onSelectChange"
+      class="header-search-select"
+      @change="change"
     >
-      <el-option
-        v-for="option in searchOptions"
-        :key="option.item.path"
-        :label="option.item.title.join(' > ')"
-        :value="option.item"
-      ></el-option>
+      <el-option v-for="option in options" :key="option.item.path" :value="option.item" :label="option.item.title.join(' > ')" />
     </el-select>
   </div>
 </template>
 
-<script setup>
-import { computed, ref, watch } from 'vue'
-import { generateRoutes } from './FuseData'
-import Fuse from 'fuse.js'
-import { filterRouters } from '@/utils/route'
-import { useRouter } from 'vue-router'
-import { watchSwitchLang } from '@/utils/i18n'
+<script>
+// fuse is a lightweight fuzzy-search module
+// make search results more in line with expectations
+import Fuse from 'fuse.js/dist/fuse.min.js'
+import path from 'path'
 
-// 控制 search 显示
-const isShow = ref(false)
-// el-select 实例
-const headerSearchSelectRef = ref(null)
-const onShowClick = () => {
-  isShow.value = !isShow.value
-  headerSearchSelectRef.value.focus()
-}
-
-// search 相关
-const search = ref('')
-// 搜索结果
-const searchOptions = ref([])
-// 搜索方法
-const querySearch = query => {
-  if (query !== '') {
-    searchOptions.value = fuse.search(query)
-  } else {
-    searchOptions.value = []
-  }
-}
-// 选中回调
-const onSelectChange = val => {
-  router.push(val.path)
-  onClose()
-}
-
-// 检索数据源
-const router = useRouter()
-let searchPool = computed(() => {
-  const filterRoutes = filterRouters(router.getRoutes())
-  return generateRoutes(filterRoutes)
-})
-/**
- * 搜索库相关
- */
-let fuse
-const initFuse = searchPool => {
-  fuse = new Fuse(searchPool, {
-    // 是否按优先级进行排序
-    shouldSort: true,
-    // 匹配算法放弃的时机， 阈值 0.0 需要完美匹配（字母和位置），阈值 1.0 将匹配任何内容。
-    threshold: 0.4,
-    // 匹配长度超过这个值的才会被认为是匹配的
-    minMatchCharLength: 1,
-    // 将被搜索的键列表。 这支持嵌套路径、加权搜索、在字符串和对象数组中搜索。
-    // name：搜索的键
-    // weight：对应的权重
-    keys: [
-      {
-        name: 'title',
-        weight: 0.7
-      },
-      {
-        name: 'path',
-        weight: 0.3
+export default {
+  name: 'HeaderSearch',
+  data() {
+    return {
+      search: '',
+      options: [],
+      searchPool: [],
+      show: false,
+      fuse: undefined
+    }
+  },
+  computed: {
+    routes() {
+      return this.$store.getters.permission_routes
+    }
+  },
+  watch: {
+    routes() {
+      this.searchPool = this.generateRoutes(this.routes)
+    },
+    searchPool(list) {
+      this.initFuse(list)
+    },
+    show(value) {
+      if (value) {
+        document.body.addEventListener('click', this.close)
+      } else {
+        document.body.removeEventListener('click', this.close)
       }
-    ]
-  })
-}
-initFuse(searchPool.value)
+    }
+  },
+  mounted() {
+    this.searchPool = this.generateRoutes(this.routes)
+  },
+  methods: {
+    click() {
+      this.show = !this.show
+      if (this.show) {
+        this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.focus()
+      }
+    },
+    close() {
+      this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.blur()
+      this.options = []
+      this.show = false
+    },
+    change(val) {
+      const path = val.path;
+      if(this.ishttp(val.path)) {
+        // http(s):// 路径新窗口打开
+        const pindex = path.indexOf("http");
+        window.open(path.substr(pindex, path.length), "_blank");
+      } else {
+        this.$router.push(val.path)
+      }
+      this.search = ''
+      this.options = []
+      this.$nextTick(() => {
+        this.show = false
+      })
+    },
+    initFuse(list) {
+      this.fuse = new Fuse(list, {
+        shouldSort: true,
+        threshold: 0.4,
+        location: 0,
+        distance: 100,
+        maxPatternLength: 32,
+        minMatchCharLength: 1,
+        keys: [{
+          name: 'title',
+          weight: 0.7
+        }, {
+          name: 'path',
+          weight: 0.3
+        }]
+      })
+    },
+    // Filter out the routes that can be displayed in the sidebar
+    // And generate the internationalized title
+    generateRoutes(routes, basePath = '/', prefixTitle = []) {
+      let res = []
 
-/**
- * 关闭 search 的处理事件
- */
-const onClose = () => {
-  headerSearchSelectRef.value.blur()
-  isShow.value = false
-  searchOptions.value = []
-}
-/**
- * 监听 search 打开，处理 close 事件
- */
-watch(isShow, val => {
-  if (val) {
-    document.body.addEventListener('click', onClose)
-  } else {
-    document.body.removeEventListener('click', onClose)
+      for (const router of routes) {
+        // skip hidden router
+        if (router.hidden) { continue }
+
+        const data = {
+          path: !this.ishttp(router.path) ? path.resolve(basePath, router.path) : router.path,
+          title: [...prefixTitle]
+        }
+
+        if (router.meta && router.meta.title) {
+          data.title = [...data.title, router.meta.title]
+
+          if (router.redirect !== 'noRedirect') {
+            // only push the routes with title
+            // special case: need to exclude parent router without redirect
+            res.push(data)
+          }
+        }
+
+        // recursive child routes
+        if (router.children) {
+          const tempRoutes = this.generateRoutes(router.children, data.path, data.title)
+          if (tempRoutes.length >= 1) {
+            res = [...res, ...tempRoutes]
+          }
+        }
+      }
+      return res
+    },
+    querySearch(query) {
+      if (query !== '') {
+        this.options = this.fuse.search(query)
+      } else {
+        this.options = []
+      }
+    },
+    ishttp(url) {
+      return url.indexOf('http://') !== -1 || url.indexOf('https://') !== -1
+    }
   }
-})
-
-// 处理国际化
-watchSwitchLang(() => {
-  searchPool = computed(() => {
-    const filterRoutes = filterRouters(router.getRoutes())
-    return generateRoutes(filterRoutes)
-  })
-  initFuse(searchPool.value)
-})
+}
 </script>
 
 <style lang="scss" scoped>
 .header-search {
   font-size: 0 !important;
+
   .search-icon {
     cursor: pointer;
     font-size: 18px;
     vertical-align: middle;
   }
+
   .header-search-select {
     font-size: 18px;
     transition: width 0.2s;
@@ -154,6 +179,7 @@ watchSwitchLang(() => {
       vertical-align: middle;
     }
   }
+
   &.show {
     .header-search-select {
       width: 210px;

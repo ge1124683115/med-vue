@@ -1,59 +1,122 @@
-const path = require('path')
-function resolve(dir) {
-  return path.join(__dirname, dir)
+'use strict'
+const path = require( 'path' )
+const defaultSettings = require( './src/settings' )
+
+function resolve( dir ) {
+  return path.join( __dirname, dir )
 }
-// https://cli.vuejs.org/zh/guide/webpack.html#%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F
+
+const name = process.env.VUE_APP_TITLE || '平台后台管理系统' // 网页标题
+
+const port = 8083 || process.env.port || process.env.npm_config_port // 端口
+
+// vue.config.js 配置说明
+//官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
+// 这里只列一部分，具体配置参考文档
 module.exports = {
+  // 部署生产环境和开发环境下的URL。
+  // 默认情况下，Vue CLI 会假设你的应用是被部署在一个域名的根路径上
+  // 例如 https://www.ruoyi.vip/。如果应用被部署在一个子路径上，你就需要用这个选项指定这个子路径。例如，如果你的应用被部署在 https://www.ruoyi.vip/admin/，则设置 baseUrl 为 /admin/。
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
+  // 在npm run build 或 yarn build 时 ，生成文件的目录名称（要和baseUrl的生产环境路径一致）（默认dist）
+  outputDir: 'dist',
+  // 用于放置生成的静态资源 (js、css、img、fonts) 的；（项目打包之后，静态资源会放在这个文件夹下）
+  assetsDir: 'static',
+  // 是否开启eslint保存检测，有效值：ture | false | 'error'
+  lintOnSave: process.env.NODE_ENV === 'development',
+  // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
+  productionSourceMap: false,
+  // webpack-dev-server 相关配置
   devServer: {
-    // 配置反向代理
+    host: '0.0.0.0',
+    port: port,
+    open: true,
     proxy: {
-      // 当地址中有/api的时候会触发代理机制
-      '/api': {
-        // 要代理的服务器地址  这里不用写 api
-        target: 'https://api.imooc-admin.lgdsunday.club/',
-        // target: 'http://127.0.0.1:3004/',
-        changeOrigin: true // 是否跨域
+      // detail: https://cli.vuejs.org/config/#devserver-proxy
+      [process.env.VUE_APP_BASE_API]: {
+        // target: `http://kaiyu.wicp.vip:39592`,
+        target: process.env.VUE_APP_SERVICE_URL,//kaiyu.wicp.vip:39592
+        // target: `http://localhost:8080`,
+        changeOrigin: true,
+        pathRewrite: {
+          ['^' + process.env.VUE_APP_BASE_API]: ''
+        }
+      }
+    },
+    disableHostCheck: true
+  },
+  configureWebpack: {
+    name: name,
+    resolve: {
+      alias: {
+        '@': resolve( 'src' )
       }
     }
   },
-  chainWebpack(config) {
-    // 设置 svg-sprite-loader
-    // config 为 webpack 配置对象
-    // config.module 表示创建一个具名规则，以后用来修改规则
+  chainWebpack( config ) {
+    config.plugins.delete( 'preload' ) // TODO: need test
+    config.plugins.delete( 'prefetch' ) // TODO: need test
+    // set svg-sprite-loader
     config.module
-      // 规则
-      .rule('svg')
-      // 忽略
-      .exclude.add(resolve('src/icons'))
-      // 结束
-      .end()
-    // config.module 表示创建一个具名规则，以后用来修改规则
+          .rule( 'svg' )
+          .exclude.add( resolve( 'src/assets/icons' ) )
+          .end()
     config.module
-      // 规则
-      .rule('icons')
-      // 正则，解析 .svg 格式文件
-      .test(/\.svg$/)
-      // 解析的文件
-      .include.add(resolve('src/icons'))
-      // 结束
-      .end()
-      // 新增了一个解析的loader
-      .use('svg-sprite-loader')
-      // 具体的loader
-      .loader('svg-sprite-loader')
-      // loader 的配置
-      .options({
-        symbolId: 'icon-[name]'
-      })
-      // 结束
-      .end()
-    // 创建一个新的规则，用于处理 element-plus 2 的错误
-    config.module
-      .rule('element-plus-2')
-      .test(/\.mjs$/)
-      // https://webpack.docschina.org/configuration/module/#ruletype
-      .type('javascript/auto')
-      .include.add(/node_modules/)
-      .end()
+          .rule( 'icons' )
+          .test( /\.svg$/ )
+          .include.add( resolve( 'src/assets/icons' ) )
+          .end()
+          .use( 'svg-sprite-loader' )
+          .loader( 'svg-sprite-loader' )
+          .options( {
+            symbolId: 'icon-[name]'
+          } )
+          .end()
+
+    config.when( process.env.NODE_ENV !== 'development', config => {
+          config
+            .plugin( 'ScriptExtHtmlWebpackPlugin' )
+            .after( 'html' )
+            .use( 'script-ext-html-webpack-plugin', [ {
+              // `runtime` must same as runtimeChunk name. default is `runtime`
+              inline: /runtime\..*\.js$/
+            } ] )
+            .end()
+          config
+            .optimization.splitChunks( {
+            chunks: 'all',
+            cacheGroups: {
+              libs: {
+                name: 'chunk-libs',
+                test: /[\\/]node_modules[\\/]/,
+                priority: 10,
+                chunks: 'initial' // only package third parties that are initially dependent
+              },
+              elementUI: {
+                name: 'chunk-elementUI', // split elementUI into a single package
+                priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+                test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
+              },
+              commons: {
+                name: 'chunk-commons',
+                test: resolve( 'src/components' ), // can customize your rules
+                minChunks: 3, //  minimum common number
+                priority: 5,
+                reuseExistingChunk: true
+              }
+            }
+          } )
+          config.optimization.runtimeChunk( 'single' ),
+            {
+              from: path.resolve( __dirname, './public/robots.txt' ), //防爬虫文件
+              to: './', //到根目录下
+            }
+        })
+    const entry = config.entry( 'app' )
+    if ( defaultSettings.isMock ) {
+      entry
+        .add( '@/mock' )
+        .end()
+    }
   }
 }

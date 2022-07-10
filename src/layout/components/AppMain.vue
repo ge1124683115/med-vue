@@ -1,86 +1,77 @@
 <template>
-  <div class="app-main">
-    <router-view v-slot="{ Component, route }">
-      <transition name="fade-transform" mode="out-in">
-        <keep-alive>
-          <component :is="Component" :key="route.path" />
-        </keep-alive>
-      </transition>
-    </router-view>
-  </div>
+  <section class="app-main">
+    <transition name="fade-transform" mode="out-in">
+      <keep-alive :include="cachedViews">
+        <router-view :key="key" />
+      </keep-alive>
+    </transition>
+    <el-footer class="app-main-footer">
+      <p>
+        <a target="_blank" href="https://beian.miit.gov.cn">粤ICP备2022041529号</a>
+        <!--          &nbsp;&nbsp;|&nbsp;&nbsp;-->
+        <!--          <img src="http://www.beian.gov.cn/img/ghs.png" style="width:16px;height:16px;display:inline-block;margin-right:4px;">-->
+        <!--          <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030902003184">粤公网安备44030902003184号</a>-->
+      </p>
+      <p>Copyright © <a target="_blank" href="https://www.dexp.cc">dexp.cc</a> All Rights Reserved 天财商龙</p>
+    </el-footer>
+  </section>
 </template>
 
-<script setup>
-import { watch } from 'vue'
-import { isTags } from '@/utils/tags'
-import { generateTitle, watchSwitchLang } from '@/utils/i18n'
-import { useRoute } from 'vue-router'
-import { useStore } from 'vuex'
-
-const route = useRoute()
-
-/**
- * 生成 title
- */
-const getTitle = route => {
-  let title = ''
-  if (!route.meta) {
-    // 处理无 meta 的路由
-    const pathArr = route.path.split('/')
-    title = pathArr[pathArr.length - 1]
-  } else {
-    title = generateTitle(route.meta.title)
+<script>
+export default {
+  name: 'AppMain',
+  computed: {
+    cachedViews() {
+      return this.$store.state.tagsView.cachedViews
+    },
+    key() {
+      return this.$route.path
+    }
   }
-  return title
 }
-
-/**
- * 监听路由变化
- */
-const store = useStore()
-watch(
-  route,
-  (to, from) => {
-    if (!isTags(to.path)) return
-    const { fullPath, meta, name, params, path, query } = to
-    store.commit('app/addTagsViewList', {
-      fullPath,
-      meta,
-      name,
-      params,
-      path,
-      query,
-      title: getTitle(to)
-    })
-  },
-  {
-    immediate: true
-  }
-)
-
-/**
- * 国际化 tags
- */
-watchSwitchLang(() => {
-  store.getters.tagsViewList.forEach((route, index) => {
-    store.commit('app/changeTagsView', {
-      index,
-      tag: {
-        ...route,
-        title: getTitle(route)
-      }
-    })
-  })
-})
 </script>
 
 <style lang="scss" scoped>
 .app-main {
-  min-height: calc(100vh - 50px - 43px);
+  /* 50= navbar  50  */
+  min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
   overflow: hidden;
-  padding: 104px 20px 20px 20px;
-  box-sizing: border-box;
+  &-footer {
+    color: #888;
+    text-align: center;
+    line-height:24px;
+    p{
+      font: 12px/1.5 "microsoft yahei",Helvetica,Tahoma,Arial,"Microsoft jhengHei",sans-serif;
+      color: #888;
+      line-height:24px;
+      margin:0;
+    }
+  }
+}
+
+.fixed-header+.app-main {
+  padding-top: 50px;
+}
+
+.hasTagsView {
+  .app-main {
+    /* 84 = navbar + tags-view = 50 + 34 */
+    min-height: calc(100vh - 84px);
+  }
+
+  .fixed-header+.app-main {
+    padding-top: 84px;
+  }
+}
+</style>
+
+<style lang="scss">
+// fix css style bug in open el-dialog
+.el-popup-parent--hidden {
+  .fixed-header {
+    padding-right: 15px;
+  }
 }
 </style>

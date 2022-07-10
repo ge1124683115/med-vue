@@ -1,24 +1,42 @@
-import { TIME_STAMP, TOKEN_TIMEOUT_VALUE } from '@/constant'
-import { setItem, getItem } from '@/utils/storage'
-/**
- * 获取时间戳
- */
-export function getTimeStamp() {
-  return getItem(TIME_STAMP)
+const _key = '0132456789abcdef'
+const _iv = 'fedcba9876543210'
+
+const TokenKey = 'Access-Token'
+const UserKey = 'Access-User'
+
+export function getToken() {
+  return localStorage.getItem(TokenKey)
 }
-/**
- * 设置时间戳
- */
-export function setTimeStamp() {
-  setItem(TIME_STAMP, Date.now())
+
+export function setToken(token) {
+  return localStorage.setItem(TokenKey, token)
 }
-/**
- * 是否超时
- */
-export function isCheckTimeout() {
-  // 当前时间戳
-  var currentTime = Date.now()
-  // 缓存时间戳
-  var timeStamp = getTimeStamp()
-  return currentTime - timeStamp > TOKEN_TIMEOUT_VALUE
+
+export function removeToken() {
+  return localStorage.removeItem(TokenKey)
+}
+
+function setUser(user) {
+  return localStorage.setItem(UserKey, user)
+}
+
+function getUser() {
+  return localStorage.getItem(UserKey)
+}
+
+function removeUser() {
+  localStorage.removeItem(UserKey)
+}
+
+function clearAuth() {
+  removeUser()
+  removeToken();
+}
+
+export {
+  _key,
+  _iv,
+  setUser,
+  getUser,
+  clearAuth,
 }

@@ -1,44 +1,50 @@
 import router from './router'
 import store from './store'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import {clearAuth, getToken, getUser} from '@/utils/auth'
 
-// 白名单
-const whiteList = ['/login']
-/**
- * 路由前置守卫
- */
-router.beforeEach(async (to, from, next) => {
-  // 存在 token ，进入主页
-  // if (store.state.user.token) {
-  // 快捷访问
-  if (store.getters.token) {
-    if (to.path === '/login') {
-      next('/')
+NProgress.configure({showSpinner: false})
+
+const whiteList = ['/login', '/auth-redirect', '/bind', '/register']
+
+router.beforeEach((to, from, next) => {
+  NProgress.start()
+  if (getToken() && getUser()) {
+    to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
+    /* has token*/
+    if (store.getters?.roles?.length === 0) {
+      // 判断当前用户是否已拉取完user_info信息
+      store.dispatch('GetInfo').then(res => {
+        // 拉取user_info
+        const roles = res.roles
+        return store.dispatch('GenerateRoutesAndDictionary', {roles})
+      }).then(accessRoutes => {
+        // 根据roles权限生成可访问的路由表
+        router.addRoutes(accessRoutes) // 动态添加可访问路由表
+        next({...to, replace: true}) // hack方法 确保addRoutes已完成
+      }).catch(err => {
+        console.error(err)
+        clearAuth()
+        next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
+      })
     } else {
-      // 判断用户资料是否获取
-      // 若不存在用户信息，则需要获取用户信息
-      if (!store.getters.hasUserInfo) {
-        // 触发获取用户信息的 action，并获取用户当前权限
-        const { permission } = await store.dispatch('user/getUserInfo')
-        // 处理用户权限，筛选出需要添加的权限
-        const filterRoutes = await store.dispatch(
-          'permission/filterRoutes',
-          permission.menus
-        )
-        // 利用 addRoute 循环添加
-        filterRoutes.forEach(item => {
-          router.addRoute(item)
-        })
-        // 添加完动态路由之后，需要在进行一次主动跳转
-        return next(to.path)
-      }
+      NProgress.done()
       next()
     }
   } else {
-    // 没有token的情况下，可以进入白名单
-    if (whiteList.indexOf(to.path) > -1) {
+    // 没有token
+    if (whiteList.indexOf(to.path) !== -1) {
+      // 在免登录白名单，直接进入
       next()
     } else {
-      next('/login')
+      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
+      NProgress.done()
+      // window.location.href = `./login?redirectURL=${window.location.href}`
     }
   }
+})
+
+router.afterEach(() => {
+  NProgress.done()
 })

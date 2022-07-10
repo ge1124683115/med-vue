@@ -1,25 +1,20 @@
-import { MAIN_COLOR } from '@/constant'
-import { getItem } from '@/utils/storage'
-import { generateColors } from '@/utils/theme'
-
 const getters = {
+  sidebar: state => state.app.sidebar,
+  size: state => state.app.size,
+  device: state => state.app.device,
+  visitedViews: state => state.tagsView.visitedViews,
+  cachedViews: state => state.tagsView.cachedViews,
   token: state => state.user.token,
-  userInfo: state => state.user.userInfo,
-  /**
-   * @returns true 表示已存在用户信息
-   */
-  hasUserInfo: state => {
-    return JSON.stringify(state.user.userInfo) !== '{}'
-  },
-  cssVar: state => {
-    return {
-      ...state.theme.variables,
-      ...generateColors(getItem(MAIN_COLOR))
-    }
-  },
-  sidebarOpened: state => state.app.sidebarOpened,
-  language: state => state.app.language,
-  mainColor: state => state.theme.mainColor,
-  tagsViewList: state => state.app.tagsViewList
+  avatar: state => state.user.avatar,
+  logo: state => state.user?.info?.tenantLogo,
+  user: state => state.user,
+  name: state => state.user.name,
+  introduction: state => state.user.introduction,
+  roles: state => state.user.roles,
+  permissions: state => state.user.permissions,
+  permission_routes: state => state.permission.routes,
+  topbarRouters: state => state.permission.topbarRouters,
+  defaultRoutes: state => state.permission.defaultRoutes,
+  sidebarRouters: state => state.permission.sidebarRouters
 }
 export default getters

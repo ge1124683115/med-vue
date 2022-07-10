@@ -1,71 +1,56 @@
-import { LANG, TAGS_VIEW } from '@/constant'
-import { getItem, setItem } from '@/utils/storage'
-export default {
-  namespaced: true,
-  state: () => ({
-    sidebarOpened: true,
-    language: getItem(LANG) || 'zh',
-    tagsViewList: getItem(TAGS_VIEW) || []
-  }),
-  mutations: {
-    triggerSidebarOpened(state) {
-      state.sidebarOpened = !state.sidebarOpened
-    },
-    /**
-     * 设置国际化
-     */
-    setLanguage(state, lang) {
-      setItem(LANG, lang)
-      state.language = lang
-    },
-    /**
-     * 初始化 tagsList
-     */
-    initTagsViewList(state) {
-      state.tagsViewList = []
-    },
-    /**
-     * 添加 tags
-     */
-    addTagsViewList(state, tag) {
-      const isFind = state.tagsViewList.find(item => {
-        return item.path === tag.path
-      })
-      // 处理重复
-      if (!isFind) {
-        state.tagsViewList.push(tag)
-        setItem(TAGS_VIEW, state.tagsViewList)
-      }
-    },
-    /**
-     * 为指定的 tag 修改 title
-     */
-    changeTagsView(state, { index, tag }) {
-      state.tagsViewList[index] = tag
-      setItem(TAGS_VIEW, state.tagsViewList)
-    },
-    /**
-     * 删除 tag
-     * @param {type: 'other'||'right'||'index', index: index} payload
-     */
-    removeTagsView(state, payload) {
-      if (payload.type === 'index') {
-        state.tagsViewList.splice(payload.index, 1)
-        return
-      } else if (payload.type === 'other') {
-        state.tagsViewList.splice(
-          payload.index + 1,
-          state.tagsViewList.length - payload.index + 1
-        )
-        state.tagsViewList.splice(0, payload.index)
-      } else if (payload.type === 'right') {
-        state.tagsViewList.splice(
-          payload.index + 1,
-          state.tagsViewList.length - payload.index + 1
-        )
-      }
-      setItem(TAGS_VIEW, state.tagsViewList)
+import Cookies from 'js-cookie'
+
+const state = {
+  sidebar: {
+    opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
+    withoutAnimation: false
+  },
+  device: 'desktop',
+  size: Cookies.get('size') || 'medium'
+}
+
+const mutations = {
+  TOGGLE_SIDEBAR: state => {
+    state.sidebar.opened = !state.sidebar.opened
+    state.sidebar.withoutAnimation = false
+    if (state.sidebar.opened) {
+      Cookies.set('sidebarStatus', 1)
+    } else {
+      Cookies.set('sidebarStatus', 0)
     }
   },
-  actions: {}
+  CLOSE_SIDEBAR: (state, withoutAnimation) => {
+    Cookies.set('sidebarStatus', 0)
+    state.sidebar.opened = false
+    state.sidebar.withoutAnimation = withoutAnimation
+  },
+  TOGGLE_DEVICE: (state, device) => {
+    state.device = device
+  },
+  SET_SIZE: (state, size) => {
+    state.size = size
+    Cookies.set('size', size)
+  }
+}
+
+const actions = {
+  toggleSideBar({ commit }) {
+    commit('TOGGLE_SIDEBAR')
+  },
+  closeSideBar({ commit }, { withoutAnimation }) {
+    commit('CLOSE_SIDEBAR', withoutAnimation)
+  },
+  toggleDevice({ commit }, device) {
+    commit('TOGGLE_DEVICE', device)
+  },
+  setSize({ commit }, size) {
+    commit('SET_SIZE', size)
+  }
+}
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions
 }
