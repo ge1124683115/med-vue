@@ -1,83 +1,90 @@
 <template>
-  <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
-    <div class="rightPanel-background" />
-    <div class="rightPanel">
-      <div class="rightPanel-items">
+  <div ref="rightPanel" :class="{ show: show }">
+    <div class="right-panel-background" />
+    <div class="right-panel">
+      <div
+        class="right-panel__button"
+        :style="{ top: buttonTop + 'px', 'background-color': theme }"
+        @click="show = !show"
+      >
+        <Close class="icon" v-show="show" />
+        <Setting class="icon" v-show="!show" />
+      </div>
+      <div class="right-panel__items">
         <slot />
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { addClass, removeClass } from '@/utils'
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
-export default {
-  name: 'RightPanel',
-  props: {
-    clickNotClose: {
-      default: false,
-      type: Boolean
-    },
-    buttonTop: {
-      default: 250,
-      type: Number
-    }
-  },
-  computed: {
-    show: {
-      get() {
-        return this.$store.state.settings.showSettings
-      },
-      set(val) {
-        this.$store.dispatch('settings/changeSetting', {
-          key: 'showSettings',
-          value: val
-        })
-      }
-    },
-    theme() {
-      return this.$store.state.settings.theme
-    },
-  },
-  watch: {
-    show(value) {
-      if (value && !this.clickNotClose) {
-        this.addEventClick()
-      }
-      if (value) {
-        addClass(document.body, 'showRightPanel')
-      } else {
-        removeClass(document.body, 'showRightPanel')
-      }
-    }
-  },
-  mounted() {
-    this.insertToBody()
-    this.addEventClick()
-  },
-  beforeDestroy() {
-    const elx = this.$refs.rightPanel
-    elx.remove()
-  },
-  methods: {
-    addEventClick() {
-      window.addEventListener('click', this.closeSidebar)
-    },
-    closeSidebar(evt) {
-      const parent = evt.target.closest('.rightPanel')
-      if (!parent) {
-        this.show = false
-        window.removeEventListener('click', this.closeSidebar)
-      }
-    },
-    insertToBody() {
-      const elx = this.$refs.rightPanel
-      const body = document.querySelector('body')
-      body.insertBefore(elx, body.firstChild)
-    }
+import { addClass, removeClass } from '@/utils/index';
+
+import useStore from '@/store';
+
+// 图标依赖
+import { Close, Setting } from '@element-plus/icons-vue';
+import { ElColorPicker } from 'element-plus';
+
+const { setting } = useStore();
+
+const theme = computed(() => setting.theme);
+const show = ref(false);
+
+defineProps({
+  buttonTop: {
+    default: 250,
+    type: Number
+  }
+});
+
+watch(show, value => {
+  if (value) {
+    addEventClick();
+  }
+  if (value) {
+    addClass(document.body, 'showRightPanel');
+  } else {
+    removeClass(document.body, 'showRightPanel');
+  }
+});
+
+function addEventClick() {
+  window.addEventListener('click', closeSidebar, { passive: true });
+}
+
+function closeSidebar(evt: any) {
+  // 主题选择点击不关闭
+  let parent = evt.target.closest('.theme-picker-dropdown');
+  if (parent) {
+    return;
+  }
+
+  parent = evt.target.closest('.right-panel');
+  if (!parent) {
+    show.value = false;
+    window.removeEventListener('click', closeSidebar);
   }
 }
+
+const rightPanel = ref(ElColorPicker);
+
+function insertToBody() {
+  const elx = rightPanel.value as any;
+  const body = document.querySelector('body') as any;
+  body.insertBefore(elx, body.firstChild);
+}
+
+onMounted(() => {
+  insertToBody();
+});
+
+onBeforeUnmount(() => {
+  const elx = rightPanel.value as any;
+  elx.remove();
+});
 </script>
 
 <style>
@@ -89,46 +96,52 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.rightPanel-background {
+.right-panel-background {
   position: fixed;
   top: 0;
   left: 0;
   opacity: 0;
-  transition: opacity .3s cubic-bezier(.7, .3, .1, 1);
-  background: rgba(0, 0, 0, .2);
+  transition: opacity 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+  background: rgba(0, 0, 0, 0.2);
   z-index: -1;
 }
 
-.rightPanel {
+.right-panel {
   width: 100%;
-  max-width: 260px;
+  max-width: 300px;
   height: 100vh;
   position: fixed;
   top: 0;
   right: 0;
-  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .05);
-  transition: all .25s cubic-bezier(.7, .3, .1, 1);
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s cubic-bezier(0.7, 0.3, 0.1, 1);
   transform: translate(100%);
   background: #fff;
-  z-index: 40000;
+  z-index: 199;
+
+  .icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
 }
 
 .show {
-  transition: all .3s cubic-bezier(.7, .3, .1, 1);
+  transition: all 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
 
-  .rightPanel-background {
-    z-index: 20000;
+  .right-panel-background {
+    z-index: 99;
     opacity: 1;
     width: 100%;
     height: 100%;
   }
 
-  .rightPanel {
+  .right-panel {
     transform: translate(0);
   }
 }
 
-.handle-button {
+.right-panel__button {
   width: 48px;
   height: 48px;
   position: absolute;
@@ -141,6 +154,7 @@ export default {
   cursor: pointer;
   color: #fff;
   line-height: 48px;
+
   i {
     font-size: 24px;
     line-height: 48px;

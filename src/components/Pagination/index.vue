@@ -1,110 +1,90 @@
 <template>
-  <div :class="{'hidden':hidden}" class="pagination-container">
+  <div :class="{ hidden: hidden }" class="pagination-container">
     <el-pagination
-      :small="small"
       :background="background"
-      :current-page.sync="currentPage"
-      :page-size.sync="pageSize"
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
       :layout="layout"
-      :pager-count="pagerCount"
-      :page-sizes="computedPageSizes"
+      :page-sizes="pageSizes"
       :total="total"
-      v-bind="$attrs"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
   </div>
 </template>
 
-<script>
-import {scrollTo} from '@/utils/scroll-to'
+<script setup lang="ts">
+import { computed, PropType } from 'vue';
+import { scrollTo } from '@/utils/scroll-to';
 
-export default {
-  name: 'Pagination',
-  props: {
-    total: {
-      required: true,
-      type: Number
-    },
-    page: {
-      type: Number,
-      default: 1
-    },
-    limit: {
-      type: Number,
-      default: 20
-    },
-    pageSizes: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    // 移动端页码按钮的数量端默认值5
-    pagerCount: {
-      type: Number,
-      default: document.body.clientWidth < 992 ? 5 : 7
-    },
-    layout: {
-      type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
-    },
-    background: {
-      type: Boolean,
-      default: true
-    },
-    small: {
-      type: Boolean,
-      default: false
-    },
-    autoScroll: {
-      type: Boolean,
-      default: true
-    },
-    hidden: {
-      type: Boolean,
-      default: false
+const props = defineProps({
+  total: {
+    required: true,
+    type: Number as PropType<number>,
+    default: 0
+  },
+  page: {
+    type: Number,
+    default: 1
+  },
+  limit: {
+    type: Number,
+    default: 20
+  },
+  pageSizes: {
+    type: Array as PropType<number[]>,
+    default() {
+      return [10, 20, 30, 50];
     }
   },
-  computed: {
-    currentPage: {
-      get() {
-        return this.page
-      },
-      set(val) {
-        this.$emit('update:page', val)
-      }
-    },
-    pageSize: {
-      get() {
-        return this.limit
-      },
-      set(val) {
-        this.$emit('update:limit', val)
-      }
-    },
-    computedPageSizes() {
-      let pageSizes = [10, 50, 100, 200]
-      if (pageSizes.indexOf(this.limit) < 0) {
-        pageSizes = [this.limit, 10, 50, 100, 200]
-      }
-      return pageSizes
-    }
+  layout: {
+    type: String,
+    default: 'total, sizes, prev, pager, next, jumper'
   },
+  background: {
+    type: Boolean,
+    default: true
+  },
+  autoScroll: {
+    type: Boolean,
+    default: true
+  },
+  hidden: {
+    type: Boolean,
+    default: false
+  }
+});
 
-  methods: {
-    handleSizeChange(val) {
-      this.$emit('pagination', {pageNum: this.currentPage, pageSize: val})
-      if (this.autoScroll) {
-        scrollTo(0, 800)
-      }
-    },
-    handleCurrentChange(val) {
-      this.$emit('pagination', {pageNum: val, pageSize: this.pageSize})
-      if (this.autoScroll) {
-        scrollTo(0, 800)
-      }
-    }
+const emit = defineEmits(['update:page', 'update:limit', 'pagination']);
+
+const currentPage = computed<number | undefined>({
+  get: () => props.page,
+  set: value => {
+    emit('update:page', value);
+  }
+});
+
+const pageSize = computed<number | undefined>({
+  get() {
+    return props.limit;
+  },
+  set(val) {
+    emit('update:limit', val);
+  }
+});
+
+function handleSizeChange(val: number) {
+  emit('pagination', { page: currentPage, limit: val });
+  if (props.autoScroll) {
+    scrollTo(0, 800);
+  }
+}
+
+function handleCurrentChange(val: number) {
+  currentPage.value = val;
+  emit('pagination', { page: val, limit: props.limit });
+  if (props.autoScroll) {
+    scrollTo(0, 800);
   }
 }
 </script>

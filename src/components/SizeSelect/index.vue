@@ -1,57 +1,47 @@
 <template>
-  <el-dropdown trigger="click" @command="handleSetSize">
-    <div>
+  <el-dropdown class="size-select" trigger="click" @command="handleSetSize">
+    <div class="size-select__icon">
       <svg-icon class-name="size-icon" icon-class="size" />
     </div>
-    <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item v-for="item of sizeOptions" :key="item.value" :disabled="size===item.value" :command="item.value">
-        {{
-          item.label }}
-      </el-dropdown-item>
-    </el-dropdown-menu>
+    <template #dropdown>
+      <el-dropdown-menu>
+        <el-dropdown-item
+          v-for="item of sizeOptions"
+          :key="item.value"
+          :disabled="(size || 'default') == item.value"
+          :command="item.value"
+        >
+          {{ item.label }}
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </template>
   </el-dropdown>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      sizeOptions: [
-        { label: 'Default', value: 'default' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'Small', value: 'small' },
-        { label: 'Mini', value: 'mini' }
-      ]
-    }
-  },
-  computed: {
-    size() {
-      return this.$store.getters.size
-    }
-  },
-  methods: {
-    handleSetSize(size) {
-      this.$ELEMENT.size = size
-      this.$store.dispatch('app/setSize', size)
-      this.refreshView()
-      this.$message({
-        message: 'Switch Size Success',
-        type: 'success'
-      })
-    },
-    refreshView() {
-      // In order to make the cached page re-rendered
-      this.$store.dispatch('tagsView/delAllCachedViews', this.$route)
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { ElMessage } from 'element-plus';
 
-      const { fullPath } = this.$route
+import useStore from '@/store';
+import SvgIcon from '@/components/SvgIcon/index.vue';
 
-      this.$nextTick(() => {
-        this.$router.replace({
-          path: '/redirect' + fullPath
-        })
-      })
-    }
-  }
+const { app } = useStore();
+const size = computed(() => app.size);
 
+const sizeOptions = ref([
+  { label: '默认', value: 'default' },
+  { label: '大型', value: 'large' },
+  { label: '小型', value: 'small' }
+]);
+
+function handleSetSize(size: string) {
+  app.setSize(size);
+  ElMessage.success('切换布局大小成功');
 }
 </script>
+
+<style lang="scss" scoped>
+.size-select__icon {
+  line-height: 50px;
+}
+</style>

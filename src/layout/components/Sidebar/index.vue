@@ -1,57 +1,51 @@
 <template>
-    <div :class="{'has-logo':showLogo}" :style="{ backgroundColor: settings.sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }">
-        <logo v-if="showLogo" :collapse="isCollapse" />
-        <el-scrollbar :class="settings.sideTheme" wrap-class="scrollbar-wrapper">
-            <el-menu
-                :default-active="activeMenu"
-                :collapse="isCollapse"
-                :background-color="settings.sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg"
-                :text-color="settings.sideTheme === 'theme-dark' ? variables.menuText : 'rgba(0,0,0,.65)'"
-                :unique-opened="true"
-                :active-text-color="settings.theme"
-                :collapse-transition="false"
-                mode="vertical"
-            >
-                <sidebar-item
-                    v-for="(route, index) in sidebarRouters"
-                    :key="route.path  + index"
-                    :item="route"
-                    :base-path="route.path"
-                />
-            </el-menu>
-        </el-scrollbar>
-    </div>
+  <div :class="{ 'has-logo': showLogo }">
+    <logo v-if="showLogo" :collapse="isCollapse" />
+    <el-scrollbar>
+      <el-menu
+        :default-active="activeMenu"
+        :collapse="isCollapse"
+        :background-color="variables.menuBg"
+        :text-color="variables.menuText"
+        :active-text-color="variables.menuActiveText"
+        :unique-opened="false"
+        :collapse-transition="false"
+        mode="vertical"
+      >
+        <sidebar-item
+          v-for="route in routes"
+          :item="route"
+          :key="route.path"
+          :base-path="route.path"
+          :is-collapse="isCollapse"
+        />
+      </el-menu>
+    </el-scrollbar>
+  </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex";
-import Logo from "./Logo";
-import SidebarItem from "./SidebarItem";
-import variables from "@/assets/styles/variables.scss";
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-    components: { SidebarItem, Logo },
-    computed: {
-        ...mapState(["settings"]),
-        ...mapGetters(["sidebarRouters", "sidebar"]),
-        activeMenu() {
-            const route = this.$route;
-            const { meta, path } = route;
-            // if set path, the sidebar will highlight the path you set
-            if (meta.activeMenu) {
-                return meta.activeMenu;
-            }
-            return path;
-        },
-        showLogo() {
-            return this.$store.state.settings.sidebarLogo;
-        },
-        variables() {
-            return variables;
-        },
-        isCollapse() {
-            return !this.sidebar.opened;
-        }
-    }
-};
+import SidebarItem from './SidebarItem.vue';
+import Logo from './Logo.vue';
+import variables from '@/styles/variables.module.scss';
+import useStore from '@/store';
+
+const { permission, setting, app } = useStore();
+
+const route = useRoute();
+const routes = computed(() => permission.routes);
+const showLogo = computed(() => setting.sidebarLogo);
+const isCollapse = computed(() => !app.sidebar.opened);
+
+const activeMenu = computed(() => {
+  const { meta, path } = route;
+  // if set path, the sidebar will highlight the path you set
+  if (meta.activeMenu) {
+    return meta.activeMenu as string;
+  }
+  return path;
+});
 </script>

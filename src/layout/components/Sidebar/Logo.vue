@@ -1,59 +1,39 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}"
-       :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }"
-  >
-    <img v-if="logo" :src="logo" class="sidebar-logo"/>
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
-      <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <h1 v-if="!logo" class="sidebar-title"
-            :style="{ color: sideTheme === 'theme-dark' ? variables.sidebarTitle : variables.sidebarLightTitle }"
-        >{{ title }} </h1>
+      <router-link
+        v-if="collapse"
+        key="collapse"
+        class="sidebar-logo-link"
+        to="/"
+      >
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
+        <h1 v-else class="sidebar-title">vue3-element-admin</h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <h1 class="sidebar-title"
-            :style="{ color: sideTheme === 'theme-dark' ? variables.sidebarTitle : variables.sidebarLightTitle }"
-        >{{ title }} </h1>
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
+        <h1 class="sidebar-title">vue3-element-admin</h1>
       </router-link>
     </transition>
   </div>
 </template>
 
-<script>
-import variables from '@/assets/styles/variables.scss'
-import {mapState} from "vuex";
-import store from "@/store";
+<script setup lang="ts">
+import { reactive, toRefs } from 'vue';
 
-export default {
-  name: 'SidebarLogo',
-  props: {
-    collapse: {
-      type: Boolean,
-      required: true
-    }
-  },
-  computed: {
-    variables() {
-      return variables
-    },
-    sideTheme() {
-      return this.$store.state.settings.sideTheme
-    },
-    ...mapState(['user'])
-  },
-  data() {
-    return {
-      title: '平台后台管理系统',
-      logo: 'https://mankind.oss-cn-guangzhou.aliyuncs.com/shian_second/logo20220321.png'
-    }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.logo = store.getters.logo || 'https://mankind.oss-cn-guangzhou.aliyuncs.com/shian_second/logo20220321.png'
-      const tenantName = this.user?.info?.tenantName;
-      tenantName&&(this.title=tenantName)
-    })
+const props = defineProps({
+  collapse: {
+    type: Boolean,
+    required: true
   }
-}
+});
+
+const state = reactive({
+  isCollapse: props.collapse,
+  logo: new URL(`../../../assets/logo.png`, import.meta.url).href
+});
+
+const { logo } = toRefs(state);
 </script>
 
 <style lang="scss" scoped>
@@ -67,10 +47,6 @@ export default {
 }
 
 .sidebar-logo-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
   position: relative;
   width: 100%;
   height: 50px;
@@ -81,12 +57,12 @@ export default {
 
   & .sidebar-logo-link {
     height: 100%;
+    width: 100%;
 
     & .sidebar-logo {
-      width: 32px;
-      height: 32px;
+      width: 20px;
+      height: 20px;
       vertical-align: middle;
-      margin-right: 12px;
     }
 
     & .sidebar-title {
@@ -98,6 +74,7 @@ export default {
       font-size: 14px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
+      margin-left: 12px;
     }
   }
 
@@ -105,13 +82,6 @@ export default {
     .sidebar-logo {
       margin-right: 0px;
     }
-  }
-
-  .sidebar-logo {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-    margin-right: 12px;
   }
 }
 </style>
