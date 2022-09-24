@@ -1,85 +1,85 @@
 <template>
   <div class="navbar">
-    <hamburger
-      id="hamburger-container"
-      :is-active="sidebar.opened"
-      class="hamburger-container"
-      @toggleClick="toggleSideBar"
-    />
-
-    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+    <hamburger id="hamburger-container" :is-active="appStore.sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!settingsStore.topNav" />
+    <top-nav id="topmenu-container" class="topmenu-container" v-if="settingsStore.topNav" />
 
     <div class="right-menu">
-      <template v-if="device !== 'mobile'">
-        <!--        <search id="header-search" class="right-menu-item" />
-                <error-log class="errLog-container right-menu-item hover-effect" />-->
+      <template v-if="appStore.device !== 'mobile'">
+        <header-search id="header-search" class="right-menu-item" />
+
+        <el-tooltip content="源码地址" effect="dark" placement="bottom">
+          <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
+        </el-tooltip>
+
+        <el-tooltip content="文档地址" effect="dark" placement="bottom">
+          <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
+        </el-tooltip>
+
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
+
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
-        <lang-select class="right-menu-item hover-effect" />
       </template>
-
-      <el-dropdown
-        class="avatar-container right-menu-item hover-effect"
-        trigger="click"
-      >
-        <div class="avatar-wrapper">
-          <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar" />
-          <CaretBottom style="width: 0.6em; height: 0.6em; margin-left: 5px" />
-        </div>
-
-        <template #dropdown>
-          <el-dropdown-menu>
-            <router-link to="/">
-              <el-dropdown-item>{{ $t('navbar.dashboard') }}</el-dropdown-item>
-            </router-link>
-            <a target="_blank" href="https://github.com/hxrui">
-              <el-dropdown-item>Github</el-dropdown-item>
-            </a>
-            <a target="_blank" href="https://gitee.com/haoxr">
-              <el-dropdown-item>{{ $t('navbar.gitee') }}</el-dropdown-item>
-            </a>
-            <a target="_blank" href="https://www.cnblogs.com/haoxianrui/">
-              <el-dropdown-item>{{ $t('navbar.document') }}</el-dropdown-item>
-            </a>
-            <el-dropdown-item divided @click="logout">
-              {{ $t('navbar.logout') }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <div class="avatar-container">
+        <el-dropdown @command="handleCommand" class="right-menu-item hover-effect" trigger="click">
+          <div class="avatar-wrapper">
+            <img :src="userStore.avatar" class="user-avatar" />
+            <el-icon><caret-bottom /></el-icon>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <router-link to="/user/profile">
+                <el-dropdown-item>个人中心</el-dropdown-item>
+              </router-link>
+              <el-dropdown-item command="setLayout">
+                <span>布局设置</span>
+              </el-dropdown-item>
+              <el-dropdown-item divided command="logout">
+                <span>退出登录</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ElMessageBox } from 'element-plus';
 
-import useStore from '@/store';
+<script setup>
+import { ElMessageBox } from 'element-plus'
+import Breadcrumb from '@/components/Breadcrumb'
+import TopNav from '@/components/TopNav'
+import Hamburger from '@/components/Hamburger'
+import Screenfull from '@/components/Screenfull'
+import SizeSelect from '@/components/SizeSelect'
+import HeaderSearch from '@/components/HeaderSearch'
+import RuoYiGit from '@/components/RuoYi/Git'
+import RuoYiDoc from '@/components/RuoYi/Doc'
+import useAppStore from '@/store/modules/app'
+import useUserStore from '@/store/modules/user'
+import useSettingsStore from '@/store/modules/settings'
 
-// 组件依赖
-import Breadcrumb from '@/components/Breadcrumb/index.vue';
-import Hamburger from '@/components/Hamburger/index.vue';
-import Screenfull from '@/components/Screenfull/index.vue';
-import SizeSelect from '@/components/SizeSelect/index.vue';
-import LangSelect from '@/components/LangSelect/index.vue';
-
-// 图标依赖
-import { CaretBottom } from '@element-plus/icons-vue';
-
-const { app, user, tagsView } = useStore();
-
-const route = useRoute();
-const router = useRouter();
-
-const sidebar = computed(() => app.sidebar);
-const device = computed(() => app.device);
-const avatar = computed(() => user.avatar);
+const appStore = useAppStore()
+const userStore = useUserStore()
+const settingsStore = useSettingsStore()
 
 function toggleSideBar() {
-  app.toggleSidebar();
+  appStore.toggleSideBar()
+}
+
+function handleCommand(command) {
+  switch (command) {
+    case "setLayout":
+      setLayout();
+      break;
+    case "logout":
+      logout();
+      break;
+    default:
+      break;
+  }
 }
 
 function logout() {
@@ -88,24 +88,19 @@ function logout() {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    user
-      .logout()
-      .then(() => {
-        tagsView.delAllViews();
-      })
-      .then(() => {
-        router.push(`/login?redirect=${route.fullPath}`);
-      });
-  });
+    userStore.logOut().then(() => {
+      location.href = '/index';
+    })
+  }).catch(() => { });
+}
+
+const emits = defineEmits(['setLayout'])
+function setLayout() {
+  emits('setLayout');
 }
 </script>
 
-<style lang="scss" scoped>
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+<style lang='scss' scoped>
 .navbar {
   height: 50px;
   overflow: hidden;
@@ -130,10 +125,21 @@ ul {
     float: left;
   }
 
+  .topmenu-container {
+    position: absolute;
+    left: 50px;
+  }
+
+  .errLog-container {
+    display: inline-block;
+    vertical-align: top;
+  }
+
   .right-menu {
     float: right;
     height: 100%;
     line-height: 50px;
+    display: flex;
 
     &:focus {
       outline: none;
@@ -158,7 +164,7 @@ ul {
     }
 
     .avatar-container {
-      margin-right: 30px;
+      margin-right: 40px;
 
       .avatar-wrapper {
         margin-top: 5px;
@@ -171,7 +177,7 @@ ul {
           border-radius: 10px;
         }
 
-        .el-icon-caret-bottom {
+        i {
           cursor: pointer;
           position: absolute;
           right: -20px;

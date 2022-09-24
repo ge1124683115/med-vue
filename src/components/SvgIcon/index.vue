@@ -1,41 +1,53 @@
 <template>
-  <svg
-    aria-hidden="true"
-    class="svg-icon"
-    :style="'width:' + size + ';height:' + size"
-  >
-    <use :xlink:href="symbolId" :fill="color" />
+  <svg :class="svgClass" aria-hidden="true">
+    <use :xlink:href="iconName" :fill="color" />
   </svg>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
-
-const props = defineProps({
-  prefix: {
-    type: String,
-    default: 'icon'
+<script>
+export default defineComponent({
+  props: {
+    iconClass: {
+      type: String,
+      required: true
+    },
+    className: {
+      type: String,
+      default: ''
+    },
+    color: {
+      type: String,
+      default: ''
+    },
   },
-  iconClass: {
-    type: String,
-    required: false
-  },
-  color: {
-    type: String
-  },
-  size: {
-    type: String,
-    default: '1em'
+  setup(props) {
+    return {
+      iconName: computed(() => `#icon-${props.iconClass}`),
+      svgClass: computed(() => {
+        if (props.className) {
+          return `svg-icon ${props.className}`
+        }
+        return 'svg-icon'
+      })
+    }
   }
-});
-
-const symbolId = computed(() => `#${props.prefix}-${props.iconClass}`);
+})
 </script>
 
-<style scoped>
+<style scope lang="scss">
+.sub-el-icon,
+.nav-icon {
+  display: inline-block;
+  font-size: 15px;
+  margin-right: 12px;
+  position: relative;
+}
+
 .svg-icon {
-  vertical-align: -0.15em;
-  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  position: relative;
   fill: currentColor;
+  vertical-align: -2px;
 }
 </style>

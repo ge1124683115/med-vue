@@ -1,39 +1,33 @@
 <template>
-  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
+  <div class="sidebar-logo-container" :class="{ 'collapse': collapse }" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBackground : variables.menuLightBackground }">
     <transition name="sidebarLogoFade">
-      <router-link
-        v-if="collapse"
-        key="collapse"
-        class="sidebar-logo-link"
-        to="/"
-      >
+      <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo" />
-        <h1 v-else class="sidebar-title">vue3-element-admin</h1>
+        <h1 v-else class="sidebar-title" :style="{ color: sideTheme === 'theme-dark' ? variables.logoTitleColor : variables.logoLightTitleColor }">{{ title }}</h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo" />
-        <h1 class="sidebar-title">vue3-element-admin</h1>
+        <h1 class="sidebar-title" :style="{ color: sideTheme === 'theme-dark' ? variables.logoTitleColor : variables.logoLightTitleColor }">{{ title }}</h1>
       </router-link>
     </transition>
   </div>
 </template>
 
-<script setup lang="ts">
-import { reactive, toRefs } from 'vue';
+<script setup>
+import variables from '@/assets/styles/variables.module.scss'
+import logo from '@/assets/logo/logo.png'
+import useSettingsStore from '@/store/modules/settings'
 
-const props = defineProps({
+defineProps({
   collapse: {
     type: Boolean,
     required: true
   }
-});
+})
 
-const state = reactive({
-  isCollapse: props.collapse,
-  logo: new URL(`../../../assets/logo.png`, import.meta.url).href
-});
-
-const { logo } = toRefs(state);
+const title = ref('若依管理系统');
+const settingsStore = useSettingsStore();
+const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
 
 <style lang="scss" scoped>
@@ -60,9 +54,10 @@ const { logo } = toRefs(state);
     width: 100%;
 
     & .sidebar-logo {
-      width: 20px;
-      height: 20px;
+      width: 32px;
+      height: 32px;
       vertical-align: middle;
+      margin-right: 12px;
     }
 
     & .sidebar-title {
@@ -74,7 +69,6 @@ const { logo } = toRefs(state);
       font-size: 14px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
-      margin-left: 12px;
     }
   }
 

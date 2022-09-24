@@ -1,72 +1,70 @@
 <template>
-  <div :class="classObj" class="app-wrapper">
-    <div
-      v-if="device === 'mobile' && sidebar.opened"
-      class="drawer-bg"
-      @click="handleClickOutside"
-    />
-    <Sidebar class="sidebar-container" />
-    <div :class="{ hasTagsView: needTagsView }" class="main-container">
+  <div :class="classObj" class="app-wrapper" :style="{ '--current-color': theme }">
+    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
+    <sidebar v-if="!sidebar.hide" class="sidebar-container" />
+    <div :class="{ hasTagsView: needTagsView, sidebarHide: sidebar.hide }" class="main-container">
       <div :class="{ 'fixed-header': fixedHeader }">
-        <navbar />
+        <navbar @setLayout="setLayout" />
         <tags-view v-if="needTagsView" />
       </div>
-
-      <!--主页面-->
       <app-main />
-
-      <!-- 设置面板 -->
-      <RightPanel v-if="showSettings">
-        <settings />
-      </RightPanel>
+      <settings ref="settingRef" />
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, watchEffect } from 'vue';
-import { useWindowSize } from '@vueuse/core';
-import { AppMain, Navbar, Settings, TagsView } from './components/index';
-import Sidebar from './components/Sidebar/index.vue';
-import RightPanel from '@/components/RightPanel/index.vue';
+<script setup>
+import { useWindowSize } from '@vueuse/core'
+import Sidebar from './components/Sidebar/index.vue'
+import { AppMain, Navbar, Settings, TagsView } from './components'
+import defaultSettings from '@/settings'
 
-import useStore from '@/store';
+import useAppStore from '@/store/modules/app'
+import useSettingsStore from '@/store/modules/settings'
 
-const { width } = useWindowSize();
-const WIDTH = 992;
-
-const { app, setting } = useStore();
-
-const sidebar = computed(() => app.sidebar);
-const device = computed(() => app.device);
-const needTagsView = computed(() => setting.tagsView);
-const fixedHeader = computed(() => setting.fixedHeader);
-const showSettings = computed(() => setting.showSettings);
+const settingsStore = useSettingsStore()
+const theme = computed(() => settingsStore.theme);
+const sideTheme = computed(() => settingsStore.sideTheme);
+const sidebar = computed(() => useAppStore().sidebar);
+const device = computed(() => useAppStore().device);
+const needTagsView = computed(() => settingsStore.tagsView);
+const fixedHeader = computed(() => settingsStore.fixedHeader);
 
 const classObj = computed(() => ({
   hideSidebar: !sidebar.value.opened,
   openSidebar: sidebar.value.opened,
   withoutAnimation: sidebar.value.withoutAnimation,
   mobile: device.value === 'mobile'
-}));
+}))
+
+const { width, height } = useWindowSize();
+const WIDTH = 992; // refer to Bootstrap's responsive design
 
 watchEffect(() => {
-  if (width.value < WIDTH) {
-    app.toggleDevice('mobile');
-    app.closeSideBar(true);
-  } else {
-    app.toggleDevice('desktop');
+  if (device.value === 'mobile' && sidebar.value.opened) {
+    useAppStore().closeSideBar({ withoutAnimation: false })
   }
-});
+  if (width.value - 1 < WIDTH) {
+    useAppStore().toggleDevice('mobile')
+    useAppStore().closeSideBar({ withoutAnimation: true })
+  } else {
+    useAppStore().toggleDevice('desktop')
+  }
+})
 
 function handleClickOutside() {
-  app.closeSideBar(false);
+  useAppStore().closeSideBar({ withoutAnimation: false })
+}
+
+const settingRef = ref(null);
+function setLayout() {
+  settingRef.value.openSetting();
 }
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixin.scss';
-@import '@/styles/variables.module.scss';
+  @import "@/assets/styles/mixin.scss";
+  @import "@/assets/styles/variables.module.scss";
 
 .app-wrapper {
   @include clearfix;
@@ -95,12 +93,16 @@ function handleClickOutside() {
   top: 0;
   right: 0;
   z-index: 9;
-  width: calc(100% - #{$sideBarWidth});
+  width: calc(100% - #{$base-sidebar-width});
   transition: width 0.28s;
 }
 
 .hideSidebar .fixed-header {
   width: calc(100% - 54px);
+}
+
+.sidebarHide .fixed-header {
+  width: 100%;
 }
 
 .mobile .fixed-header {

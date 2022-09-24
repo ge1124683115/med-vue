@@ -1,22 +1,21 @@
 <template>
   <section class="app-main">
     <router-view v-slot="{ Component, route }">
-      <transition name="router-fade" mode="out-in">
-        <keep-alive :include="cachedViews">
-          <component :is="Component" :key="route.fullPath" />
+      <transition name="fade-transform" mode="out-in">
+        <keep-alive :include="tagsViewStore.cachedViews">
+          <component v-if="!route.meta.link" :is="Component" :key="route.path"/>
         </keep-alive>
       </transition>
     </router-view>
+    <iframe-toggle />
   </section>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
-import useStore from '@/store';
+<script setup>
+import iframeToggle from "./IframeToggle/index"
+import useTagsViewStore from '@/store/modules/tagsView'
 
-const { tagsView } = useStore();
-
-const cachedViews = computed(() => tagsView.cachedViews);
+const tagsViewStore = useTagsViewStore()
 </script>
 
 <style lang="scss" scoped>
@@ -48,7 +47,7 @@ const cachedViews = computed(() => tagsView.cachedViews);
 // fix css style bug in open el-dialog
 .el-popup-parent--hidden {
   .fixed-header {
-    padding-right: 15px;
+    padding-right: 17px;
   }
 }
 </style>
