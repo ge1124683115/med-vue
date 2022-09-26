@@ -1,6 +1,6 @@
 {
   "name": "ruoyi",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "description": "若依管理系统",
   "author": "若依",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "jsencrypt": "3.2.1",
     "nprogress": "0.2.0",
     "pinia": "2.0.14",
-    "vue": "3.2.37",
+    "vue": "3.2.39",
     "vue-cropper": "1.0.3",
     "vue-router": "4.0.14"
   },

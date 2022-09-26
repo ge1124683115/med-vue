@@ -2,7 +2,10 @@
   <section class="app-main">
     <router-view v-slot="{ Component, route }">
       <transition name="fade-transform" mode="out-in">
-        <keep-alive :include="tagsViewStore.cachedViews">
+        <div v-if="isEnableHotRefresh">
+          <component v-if="!route.meta.link" :is="Component" :key="route.path"/>
+        </div>
+        <keep-alive v-else :include="tagsViewStore.cachedViews">
           <component v-if="!route.meta.link" :is="Component" :key="route.path"/>
         </keep-alive>
       </transition>
@@ -14,8 +17,10 @@
 <script setup>
 import iframeToggle from "./IframeToggle/index"
 import useTagsViewStore from '@/store/modules/tagsView'
-
+import {computed} from "vue";
 const tagsViewStore = useTagsViewStore()
+// dev环境热更新的BUG，在dev环境关闭多tab页的缓存功能，在生产环境打开多tab的缓存功能
+const isEnableHotRefresh = computed(() => import.meta.env.MODE === 'development')
 </script>
 
 <style lang="scss" scoped>
