@@ -44,6 +44,12 @@ import DictTag from '@/components/DictTag'
 
 const app = createApp(App)
 
+app.mixin({
+  computed: {
+    console: () => console
+  }
+})
+
 // 全局方法挂载
 app.config.globalProperties.useDict = useDict
 app.config.globalProperties.download = download
