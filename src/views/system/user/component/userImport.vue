@@ -36,7 +36,6 @@
 
 <script setup>
 import { getToken } from "@/utils/auth";
-import { updateUserProfile } from "@/api/system/user";
 
 const props = defineProps({
   uploadShow: {

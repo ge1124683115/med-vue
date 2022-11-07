@@ -21,6 +21,8 @@ import defaultSettings from '@/settings'
 
 import useAppStore from '@/store/modules/app'
 import useSettingsStore from '@/store/modules/settings'
+import {onMounted, onDeactivated} from "vue";
+import { getDicts } from '@/api/system/dict/data'
 
 const settingsStore = useSettingsStore()
 const theme = computed(() => settingsStore.theme);
@@ -39,6 +41,21 @@ const classObj = computed(() => ({
 
 const { width, height } = useWindowSize();
 const WIDTH = 992; // refer to Bootstrap's responsive design
+
+
+const timer = ref(0)
+const index = ref(0)
+onMounted(() => {
+  timer.value = setInterval( () => {
+    // 其他定时执行的方法
+    index.value = index.value + 1
+    getDicts('sys_normal_disable')
+  }, 180000);
+})
+
+onDeactivated(()=>{ //离开当前组件的生命周期执行的方法
+  clearInterval(timer.value);
+})
 
 watchEffect(() => {
   if (device.value === 'mobile' && sidebar.value.opened) {
