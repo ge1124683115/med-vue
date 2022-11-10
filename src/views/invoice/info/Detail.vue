@@ -1,110 +1,194 @@
 <template>
   <!-- 添加或修改用户配置对话框 -->
-  <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
-    <el-form ref="deptRef" :model="form" :rules="rules" label-width="180px">
-      <el-row>
-        <el-col :span="8">
-          <el-form-item label="发票唯一标识符" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票代码" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" disabled/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票号码" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="开票日期" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票所属地区" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票特殊类型" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="购买方名称" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="购买方地址、电话" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="购买方开户行及账号" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票类型" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="发票状态" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="购买方纳税人识别号" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="价税合计(小写)" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="税额合计" prop="deptName">
-            <el-input-number v-model="form.orderNum" style="width: 100%" controls-position="right" :min="0" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="不含税金额合计" prop="deptName">
-            <el-input-number v-model="form.orderNum" style="width: 100%" controls-position="right" :min="0" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="价税合计(大写)" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="销售方地址、电话" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="销售方开户行及账号" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="销售方名称" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="销售方纳税人识别号" prop="deptName">
-            <el-input v-model="form.deptName" placeholder="" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
+  <el-dialog :title="title" v-model="open" width="1400px" append-to-body>
+    <el-descriptions class="margin-top" title="" :column="3" border>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票唯一标识符</div></template>
+        <div class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</div>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票代码</div></template>
+        {{ form.invokeTarget }}
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票号码</div></template>
+        {{ form.invokeTarget }}
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票类型</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票所属地区</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票特殊类型</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">购买方名称</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">购买方地址、电话</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">购买方开户行及账号</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">开票日期</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">发票状态</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">购买方纳税人识别号</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">价税合计(小写)</div></template>
+        <span class="value-style">kooriookamikooooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">税额合计</div></template>
+        <span class="value-style">kooriookamioriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">不含税金额合计</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">价税合计(大写)</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">权责发生制下收入所属期起</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">权责发生制下收入所属期止</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">销售方名称</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">销售方地址、电话</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">销售方开户行及账号</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">数据创建时间</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">销售方纳税人识别号</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="my-label" label-align="right">
+        <template #label><div class="cell-item">备注</div></template>
+        <span class="value-style">kooriookamikooriookamikooriookamikooriookamikooriookamikooriookami</span>
+      </el-descriptions-item>
+    </el-descriptions>
+
+<!--    <el-form :model="form" label-width="190px">-->
+<!--      <el-row>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票唯一标识符：" title="2121212非三大范德萨范德萨范德萨分萨芬的萨芬的萨芬的撒发的撒121">2121212非三大范德萨范德萨范德萨分萨芬的萨芬的萨芬的撒发的撒121</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票代码：" title="321211111111111111111111111111111111132132132">321211111111111111111111111111111111132132132</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票号码：">{{ parseTime(form.nextValidTime) }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票类型：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票所属地区：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票特殊类型：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="购买方名称：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="购买方地址、电话：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="购买方开户行及账号：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="开票日期：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="发票状态：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="购买方纳税人识别号：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="价税合计(小写)：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="不含税金额合计：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="价税合计(大写)：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="权责发生制下收入所属期起：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="权责发生制下收入所属期止：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="销售方名称：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="销售方地址、电话：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="销售方开户行及账号：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="数据创建时间：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="销售方纳税人识别号：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--        <el-col :span="8">-->
+<!--          <el-form-item label="备注：">{{ form.invokeTarget }}</el-form-item>-->
+<!--        </el-col>-->
+<!--      </el-row>-->
+<!--    </el-form>-->
+
+    <div class="nav-title">
+      <div class="title">发票项目明细数据</div>
+    </div>
+
+    <el-table v-loading="loading" :data="dataList">
+      <el-table-column label="序号" align="center" prop="postId" min-width="50"/>
+      <el-table-column label="货物或应税劳务、服务名称" align="center" prop="postId1" min-width="170"/>
+      <el-table-column label="货物或应税劳务、服务数量" align="center" prop="postCode" min-width="170"/>
+      <el-table-column label="货物或应税劳务、服务单位" align="center" prop="postName" min-width="170"/>
+      <el-table-column label="货物或应税劳务、服务单价" align="center" prop="postSort" min-width="170"/>
+      <el-table-column label="不含税金额" align="center" min-width="100" prop="postSort3"/>
+      <el-table-column label="税率" align="center" prop="postSort4"/>
+      <el-table-column label="税额" align="center" prop="postSort5"/>
+    </el-table>
+
     <template #footer>
       <div class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -129,8 +213,10 @@ const props = defineProps({
   // },
 });
 const emit = defineEmits(['getList'])
+const dataList = ref([]);
 const postOptions = ref([]);
 const roleOptions = ref([]);
+const loading = ref(false);
 const open = ref(false);
 const title = ref('');
 const initPassword = ref(undefined);
@@ -152,20 +238,20 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 新增按钮操作 */
-function handleAdd() {
-  reset();
-  getUser().then(response => {
-    postOptions.value = response.posts;
-    roleOptions.value = response.roles;
-    open.value = true;
-    title.value = "添加用户";
-    form.value.password = initPassword.value;
-  });
-};
+const size = ref('')
+const iconStyle = computed(() => {
+  const marginMap = {
+    large: '8px',
+    default: '6px',
+    small: '4px',
+  }
+  return {
+    marginRight: marginMap[size.value] || marginMap.default,
+  }
+})
+
 /** 修改按钮操作 */
-function handleUpdate(row) {
-  reset();
+function getDetail(row) {
   const userId = row.userId;
   // getUser(userId).then(response => {
   //   console.error(response)
@@ -175,62 +261,42 @@ function handleUpdate(row) {
   //   // form.value.postIds = response.posts;
   //   // form.value.roleIds = response.roles;
     open.value = true;
-    title.value = "编辑";
+    title.value = "发票详情";
   //   form.password = "";
   // });
 }
-defineExpose({handleAdd, handleUpdate})
+defineExpose({getDetail})
 
-
-/** 重置操作表单 */
-function reset() {
-  form.value = {
-    userId: undefined,
-    deptId: undefined,
-    userName: undefined,
-    nickName: undefined,
-    password: undefined,
-    phonenumber: undefined,
-    email: undefined,
-    sex: undefined,
-    status: "0",
-    remark: undefined,
-    postIds: [],
-    roleIds: []
-  };
-  proxy.resetForm("userRef");
-}
 
 /** 取消按钮 */
 function cancel() {
   open.value = false;
-  reset();
 }
-
-/*** 用户导入参数 */
-function beforeClose() {
-  emit('openOrCloseImportVisible', false)
-}
-
-/** 提交按钮 */
-function submitForm() {
-  proxy.$refs["userRef"].validate(valid => {
-    if (valid) {
-      if (form.value.userId != undefined) {
-        updateUser(form.value).then(response => {
-          proxy.$modal.msgSuccess("修改成功");
-          open.value = false;
-          emit('getList', null)
-        });
-      } else {
-        addUser(form.value).then(response => {
-          proxy.$modal.msgSuccess("新增成功");
-          open.value = false;
-          emit('getList', null)
-        });
-      }
-    }
-  });
-}
-
 </script>
+
+
+<style lang="scss" scoped>
+  :deep(.my-label) {
+    width: 200px !important;
+  }
+  :deep(.value-style) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 220px;
+    position: relative;
+    top: 4px;
+  }
+  .nav-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0;
+    color: #1b65b9;
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 <template>
-   <div class="app-container">
+  <div class="app-container">
+    <div style="display:flex;">
       <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="90px">
         <el-row :gutter="20">
           <el-col :span="6">
@@ -70,157 +71,195 @@
             <el-form-item label="发票来源" prop="status1">
               <el-select v-model="queryParams.status1" placeholder="全部"
                          style="width: 100%" clearable>
-                <el-option :value="1" label="药品供应商" />
-                <el-option :value="0" label="耗材供应商" />
-                </el-select>
+                <el-option :value="1" label="药品供应商"/>
+                <el-option :value="0" label="耗材供应商"/>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="发票类型" prop="status2">
               <el-select v-model="queryParams.status2" placeholder="全部"
                          style="width: 100%" clearable>
-                <el-option :value="1" label="上传" />
-                <el-option :value="0" label="查验" />
-                <el-option :value="2" label="签收" />
-                <el-option :value="3" label="结算" />
-                <el-option :value="4" label="归档" />
+                <el-option :value="1" label="上传"/>
+                <el-option :value="0" label="查验"/>
+                <el-option :value="2" label="签收"/>
+                <el-option :value="3" label="结算"/>
+                <el-option :value="4" label="归档"/>
               </el-select>
             </el-form-item>
           </el-col>
 
-          <el-col :span="6">
-            <el-form-item style="width: inherit; float: right">
-              <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-              <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-            </el-form-item>
-          </el-col>
+          <!--             <el-col :span="6">-->
+          <!--               <el-form-item style="width: inherit; float: right">-->
+          <!--                 <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>-->
+          <!--                 <el-button icon="Refresh" @click="resetQuery">重置</el-button>-->
+          <!--               </el-form-item>-->
+          <!--             </el-col>-->
         </el-row>
       </el-form>
 
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['system:post:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['system:post:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['system:post:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['system:post:export']"
-            >导出</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div style="width: 172px; margin-left: 12px; display: inline-flex">
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+      </div>
+    </div>
 
-      <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" min-width="40" align="center" />
-         <el-table-column label="序号" align="center" prop="postId" min-width="50"/>
-         <el-table-column label="发票状态" align="center" prop="postId1" />
-         <el-table-column label="开票日期" align="center" prop="postCode" />
-         <el-table-column label="发票代码" align="center" prop="postName" />
-         <el-table-column label="发票号码" align="center" prop="postSort" />
-         <el-table-column label="销售方名称" align="center" min-width="120" prop="postSort2" />
-         <el-table-column label="不含税金额" align="center" min-width="100" prop="postSort3" />
-         <el-table-column label="税额合计" align="center" prop="postSort4" />
-         <el-table-column label="价税合计" align="center" prop="postSort5" />
-         <el-table-column label="发票验真" align="center" prop="postSort6" />
-         <el-table-column label="购买方名称" align="center" min-width="120" prop="postSort7" />
-         <el-table-column label="发票来源" align="center" prop="postSort8" />
-        <el-table-column label="发票上传时间" align="center" prop="createTime" min-width="180">
-          <template #default="scope">
-            <span>{{ parseTime(scope.row.createTime) }}</span>
-          </template>
-        </el-table-column>
-         <el-table-column label="发票种类" align="center" prop="status">
-            <template #default="scope">
-               <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['system:post:add']"
+        >新增
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+            type="success"
+            plain
+            icon="Edit"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['system:post:edit']"
+        >修改
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['system:post:remove']"
+        >删除
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+            type="warning"
+            plain
+            icon="Download"
+            @click="handleExport"
+            v-hasPermi="['system:post:export']"
+        >导出
+        </el-button>
+      </el-col>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" min-width="40" align="center"/>
+      <el-table-column label="序号" align="center" prop="postId" min-width="50"/>
+      <el-table-column label="发票状态" align="center" prop="postId1"/>
+      <el-table-column label="开票日期" align="center" prop="postCode"/>
+      <el-table-column label="发票代码" align="center" prop="postName"/>
+      <el-table-column label="发票号码" align="center" prop="postSort">
+        <template #default="scope">
+          <span class="link-type" @click="getInvoiceImg(scope.row)">{{ scope.row.postName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="销售方名称" align="center" min-width="120" prop="postSort2"/>
+      <el-table-column label="不含税金额" align="center" min-width="100" prop="postSort3"/>
+      <el-table-column label="税额合计" align="center" prop="postSort4"/>
+      <el-table-column label="价税合计" align="center" prop="postSort5"/>
+      <el-table-column label="发票验真" align="center" prop="postSort6"/>
+      <el-table-column label="购买方名称" align="center" min-width="120" prop="postSort7"/>
+      <el-table-column label="发票来源" align="center" prop="postSort8"/>
+      <el-table-column label="发票上传时间" align="center" prop="createTime" min-width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="发票种类" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="发票类型" align="center" prop="status1">
+        <template #default="scope">
+          <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="修改人" align="center" prop="postSort8"/>
+      <el-table-column label="修改时间" align="center" prop="createTime" min-width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" min-width="200"
+                       fixed="right"
+                       class-name="small-padding fixed-width">
+        <template #default="scope">
+          <el-button type="text" icon="View" @click="getDetail(scope.row)" v-hasPermi="['system:post:edit']">详情
+          </el-button>
+          <el-button type="text" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:post:edit']">修改
+          </el-button>
+          <el-tooltip placement="bottom" trigger="hover" effect="light">
+            <template #content>
+              <div><el-button type="text" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">删除</el-button></div>
+              <div><el-button type="text" icon="DocumentDelete" @click="handleSuspend(scope.row)" v-hasPermi="['system:post:remove']">作废</el-button></div>
+              <div>
+                <el-button type="text" icon="Camera" @click="handleDelete(scope.row)"
+                           v-hasPermi="['system:post:remove']">影像
+                </el-button>
+              </div>
+              <div>
+                <el-button type="text" icon="Download" @click="handleDelete(scope.row)"
+                           v-hasPermi="['system:post:remove']">下载
+                </el-button>
+              </div>
+              <div>
+                <el-button type="text" icon="Van" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">
+                  状态流
+                </el-button>
+              </div>
+              <div>
+                <el-button type="text" icon="PriceTag" @click="handleDelete(scope.row)"
+                           v-hasPermi="['system:post:remove']">验真
+                </el-button>
+              </div>
             </template>
-         </el-table-column>
-        <el-table-column label="发票类型" align="center" prop="status1">
-          <template #default="scope">
-            <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
-          </template>
-        </el-table-column>
-        <el-table-column label="修改人" align="center" prop="postSort8" />
-        <el-table-column label="修改时间" align="center" prop="createTime" min-width="180">
-          <template #default="scope">
-            <span>{{ parseTime(scope.row.createTime) }}</span>
-          </template>
-        </el-table-column>
-         <el-table-column label="操作" align="center" min-width="200"
-                          fixed="right"
-                          class-name="small-padding fixed-width">
-            <template #default="scope">
-              <el-button type="text" icon="View" @click="handleUpdate(scope.row)" v-hasPermi="['system:post:edit']">详情</el-button>
-              <el-button type="text" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:post:edit']">修改</el-button>
-              <el-tooltip placement="bottom" trigger="hover" effect="light">
-                <template #content>
-                  <div><el-button type="text" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">删除</el-button></div>
-                  <div><el-button type="text" icon="DocumentDelete" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">作废</el-button></div>
-                  <div><el-button type="text" icon="Camera" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">影像</el-button></div>
-                  <div><el-button type="text" icon="Download" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">下载</el-button></div>
-                  <div><el-button type="text" icon="Van" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">状态流</el-button></div>
-                  <div><el-button type="text" icon="PriceTag" @click="handleDelete(scope.row)" v-hasPermi="['system:post:remove']">验真</el-button></div>
-                </template>
-                <el-button type="text" icon="More" v-hasPermi="['system:post:edit']">更多</el-button>
-              </el-tooltip>
-            </template>
-         </el-table-column>
-      </el-table>
+            <el-button type="text" icon="More" v-hasPermi="['system:post:edit']">更多</el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
 
-      <pagination
-         v-show="total > 0"
-         :total="total"
-         v-model:page="queryParams.pageNum"
-         v-model:limit="queryParams.pageSize"
-         @pagination="getList"
-      />
+    <pagination
+        v-show="total > 0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
+    />
 
-     <edit
-           ref="editRef"
-           @getList="getList"
-     />
-     <detail
-         ref="editRef"
-         @getList="getList"
-     />
-   </div>
+    <edit
+        ref="editRef"
+        @getList="getList"
+    />
+    <detail
+        ref="detailRef"
+        @getList="getList"
+    />
+    <invoice-img
+        ref="imgRef"
+        @getList="getList"
+    ></invoice-img>
+  </div>
+
 </template>
 
 <script setup name="Post">
-import { listPost, addPost, delPost, getPost, updatePost } from "@/api/system/post";
+import {listPost, addPost, delPost, getPost, updatePost} from "@/api/system/post";
 import edit from './Edit'
 import detail from './Detail'
+import InvoiceImg from './InvoiceImg'
 
-const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
+const {proxy} = getCurrentInstance();
+const {sys_normal_disable} = proxy.useDict("sys_normal_disable");
 
 const postList = ref([]);
 const open = ref(false);
@@ -232,6 +271,8 @@ const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
 const editRef = ref(undefined)
+const detailRef = ref(undefined)
+const imgRef = ref(undefined)
 
 const data = reactive({
   form: {},
@@ -244,14 +285,14 @@ const data = reactive({
     status: undefined
   },
   rules: {
-    postName: [{ required: true, message: "岗位名称不能为空", trigger: "blur" }],
-    postCode: [{ required: true, message: "岗位编码不能为空", trigger: "blur" }],
-    postSort: [{ required: true, message: "岗位顺序不能为空", trigger: "blur" }],
+    postName: [{required: true, message: "岗位名称不能为空", trigger: "blur"}],
+    postCode: [{required: true, message: "岗位编码不能为空", trigger: "blur"}],
+    postSort: [{required: true, message: "岗位顺序不能为空", trigger: "blur"}],
   },
   optionsObj: {
     invoiceKind: [
-        {value: '1', label: '纸质发票'},
-        {value: '2', label: '电子发票'},
+      {value: '1', label: '纸质发票'},
+      {value: '2', label: '电子发票'},
     ],
     invoiceType: [
       {value: '1', label: '增值税普通发票'},
@@ -260,7 +301,7 @@ const data = reactive({
   }
 });
 
-const { queryParams, form, rules, optionsObj } = toRefs(data);
+const {queryParams, form, rules, optionsObj} = toRefs(data);
 
 /** 查询岗位列表 */
 function getList() {
@@ -271,11 +312,13 @@ function getList() {
     loading.value = false;
   });
 }
+
 /** 取消按钮 */
 function cancel() {
   open.value = false;
   reset();
 }
+
 /** 表单重置 */
 function reset() {
   form.value = {
@@ -288,32 +331,43 @@ function reset() {
   };
   proxy.resetForm("postRef");
 }
+
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
   getList();
 }
+
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef");
   handleQuery();
 }
+
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.postId);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
+
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
   open.value = true;
   title.value = "添加岗位";
 }
+
 /** 修改按钮操作 */
 function handleUpdate(row) {
   editRef.value.handleUpdate(row)
 }
+
+/** 详情按钮操作 */
+function getDetail(row) {
+  detailRef.value.getDetail(row)
+}
+
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs["postRef"].validate(valid => {
@@ -334,21 +388,41 @@ function submitForm() {
     }
   });
 }
+
 /** 删除按钮操作 */
 function handleDelete(row) {
   const postIds = row.postId || ids.value;
-  proxy.$modal.confirm('是否确认删除岗位编号为"' + postIds + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除发票号码为"' + postIds + '"的发票，删除后无法恢复!!!').then(function () {
     return delPost(postIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => {});
+  }).catch(() => {
+  });
 }
+
+/** 删除按钮操作 */
+function handleSuspend(row) {
+  const postIds = row.postId || ids.value;
+  proxy.$modal.confirm('是否确认作废发票号码为"' + postIds + '"的发票，作废后可在作废发票中取消作废？').then(function () {
+    return delPost(postIds);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  }).catch(() => {
+  });
+}
+
 /** 导出按钮操作 */
 function handleExport() {
   proxy.download("system/post/export", {
     ...queryParams.value
   }, `post_${new Date().getTime()}.xlsx`);
+}
+
+// 查看发票影像
+function getInvoiceImg (row) {
+  imgRef.value.getDetail(row)
 }
 
 getList();
