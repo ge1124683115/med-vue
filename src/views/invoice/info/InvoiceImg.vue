@@ -1,16 +1,12 @@
 <template>
   <div>
-    <el-button @click="open = true"
-    >click to open the Dialog</el-button
-    >
-    <el-dialog :title="title" v-model="open" custom-class="my-dialog" width="1200px" append-to-body>
+    <el-dialog :title="title" :model-value="modelValue"
+               @close="cancel"
+               width="1200px">
       <div>
-        11
         <!--      <img src={`data:image/jpg;base64,${base64Img}`} alt="" style="width: 99%; height: 99%"/>-->
-        <!--      <img src='https://oscimg.oschina.net/oscnet/up-d6695f82666e5018f715c41cb7ee60d3b73.png' alt="" style="width: 99%; height: 99%"/>-->
+              <img src='https://oscimg.oschina.net/oscnet/up-d6695f82666e5018f715c41cb7ee60d3b73.png' alt="" style="width: 99%; height: 99%"/>
       </div>
-
-
 
       <template #footer>
         <div class="dialog-footer">
@@ -31,14 +27,15 @@ const { sys_normal_disable, sys_user_sex } = proxy.useDict('sys_normal_disable',
 
 
 const props = defineProps({
-  // ids: {
-  //   type: Array
-  // },
+  modelValue: {
+    type: Boolean,
+    required: true
+  },
 });
-const emit = defineEmits(['getList'])
+const emit = defineEmits(['update:modelValue', 'getList'])
 const loading = ref(false);
 const open = ref(false);
-const title = ref('');
+const title = ref('发票影像');
 const initPassword = ref(undefined);
 
 const data = reactive({
@@ -58,31 +55,20 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 修改按钮操作 */
-function getDetail(row) {
-  const userId = row.userId;
-    open.value = true;
-    title.value = "发票影像";
-}
-defineExpose({getDetail})
 
 
 /** 取消按钮 */
 function cancel() {
   open.value = false;
+  emit('update:modelValue', false)
 }
 </script>
 
 
 <style lang="scss" scoped>
-.my-dialog {
-  background-color: red;
-  font-size: 22px;
-  :deep(.el-dialog__body) {
-      background-color: red;
-    font-size: 22px;
-  /*height: 700px !important;*/
-  /*overflow-y: scroll !important;*/
-  }
+:deep(.el-dialog__body) {
+  height: 700px !important;
+  overflow-y: scroll !important;
 }
+
 </style>

@@ -154,7 +154,7 @@
                   <template #default="scope">
                      <el-tooltip content="修改" placement="top" v-if="scope.row.userId !== 1">
                         <el-button
-                           type="text"
+                           link :type="'primary'"
                            icon="Edit"
                            @click="handleUpdate(scope.row)"
                            v-hasPermi="['system:user:edit']"
@@ -162,7 +162,7 @@
                      </el-tooltip>
                      <el-tooltip content="删除" placement="top" v-if="scope.row.userId !== 1">
                         <el-button
-                           type="text"
+                           link :type="'primary'"
                            icon="Delete"
                            @click="handleDelete(scope.row)"
                            v-hasPermi="['system:user:remove']"
@@ -170,7 +170,7 @@
                      </el-tooltip>
                      <el-tooltip content="重置密码" placement="top" v-if="scope.row.userId !== 1">
                         <el-button
-                           type="text"
+                           link :type="'primary'"
                            icon="Key"
                            @click="handleResetPwd(scope.row)"
                            v-hasPermi="['system:user:resetPwd']"
@@ -178,7 +178,7 @@
                      </el-tooltip>
                      <el-tooltip content="分配角色" placement="top" v-if="scope.row.userId !== 1">
                         <el-button
-                           type="text"
+                           link :type="'primary'"
                            icon="CircleCheck"
                            @click="handleAuthRole(scope.row)"
                            v-hasPermi="['system:user:edit']"

@@ -174,7 +174,7 @@
 <!--      </el-row>-->
 <!--    </el-form>-->
 
-    <div class="nav-title">
+    <div class="nav-title" style="margin: 16px 0">
       <div class="title">发票项目明细数据</div>
     </div>
 
@@ -191,7 +191,7 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="cancel">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </template>
@@ -287,16 +287,5 @@ function cancel() {
     width: 220px;
     position: relative;
     top: 4px;
-  }
-  .nav-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 16px 0;
-    color: #1b65b9;
-    .title {
-      font-size: 16px;
-      font-weight: 600;
-    }
   }
 </style>

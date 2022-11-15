@@ -5,7 +5,7 @@
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
-          type="text"
+          link :type="'primary'"
           size="large"
           auto-complete="off"
           placeholder="账号"

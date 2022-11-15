@@ -51,7 +51,7 @@ const title = ref("显示/隐藏");
 const open = ref(false);
 
 const style = computed(() => {
-  const ret = {};
+  const ret = {float: 'right'};
   if (props.gutter) {
     ret.marginRight = `${props.gutter / 2}px`;
   }

@@ -116,13 +116,13 @@
          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
             <template #default="scope">
                <el-button
-                  type="text"
+                  link :type="'primary'"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
                   v-hasPermi="['system:config:edit']"
                >修改</el-button>
                <el-button
-                  type="text"
+                  link :type="'primary'"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
                   v-hasPermi="['system:config:remove']"

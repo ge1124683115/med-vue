@@ -122,7 +122,7 @@
          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template #default="scope">
                <el-button
-                  type="text"
+                  link :type="'primary'"
                   icon="View"
                   @click="handleView(scope.row, scope.index)"
                   v-hasPermi="['monitor:operlog:query']"
