@@ -99,16 +99,15 @@
 
     <el-tabs v-model="tabValue" class="demo-tabs" @tab-click="getList">
       <el-tab-pane label="正常发票" name="1">
-
       </el-tab-pane>
       <el-tab-pane label="作废发票" name="2">
-
       </el-tab-pane>
     </el-tabs>
 
     <div style="margin-bottom: 16px; overflow: hidden; display: flex">
       <span class="nav-title">
-        <span class="title">正常发票数据列表</span>
+        <span class="title" v-if="tabValue === '1'">正常发票数据列表</span>
+        <span class="title" v-else>作废发票数据列表</span>
       </span>
       <div style="margin-right: 20px; margin-left: auto">
         <el-button
@@ -145,7 +144,6 @@
       </div>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
     </div>
-
     <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" min-width="40" align="center"/>
       <el-table-column label="序号" align="center" prop="postId" min-width="50"/>
@@ -218,6 +216,7 @@
         </template>
       </el-table-column>
     </el-table>
+
 
     <pagination
         v-show="total > 0"
@@ -307,6 +306,7 @@ const data = reactive({
 });
 
 const {queryParams, form, rules, optionsObj} = toRefs(data);
+
 
 /** 查询岗位列表 */
 function getList() {
