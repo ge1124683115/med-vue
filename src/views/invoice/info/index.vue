@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <div style="display:flex;">
-      <el-form :model="queryParams" ref="queryRef" style="width: 100%;" :inline="true" v-show="showSearch" label-width="90px">
+    <div style="display:flex;" v-show="showSearch">
+      <el-form :model="queryParams" ref="queryRef" style="width: 100%;" :inline="true" label-width="90px">
         <el-row :gutter="20">
           <el-col :span="6">
             <el-form-item label="销售方名称" prop="status1">
@@ -97,7 +97,7 @@
       </div>
     </div>
 
-    <el-tabs v-model="tabValue" class="demo-tabs" @tab-click="getList">
+    <el-tabs v-model="queryParams.tabValue" class="demo-tabs" @tab-click="getList">
       <el-tab-pane label="正常发票" name="1">
       </el-tab-pane>
       <el-tab-pane label="作废发票" name="2">
@@ -106,10 +106,10 @@
 
     <div style="margin-bottom: 16px; overflow: hidden; display: flex">
       <span class="nav-title">
-        <span class="title" v-if="tabValue === '1'">正常发票数据列表</span>
+        <span class="title" v-if="queryParams.tabValue === '1'">正常发票数据列表</span>
         <span class="title" v-else>作废发票数据列表</span>
       </span>
-      <div style="margin-right: 20px; margin-left: auto">
+      <div style="margin-left: auto">
         <el-button
             type="success"
             plain
@@ -146,39 +146,39 @@
     </div>
     <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" min-width="40" align="center"/>
-      <el-table-column label="序号" align="center" prop="postId" min-width="50"/>
-      <el-table-column label="发票状态" align="center" prop="postId1"/>
-      <el-table-column label="开票日期" align="center" prop="postCode"/>
-      <el-table-column label="发票代码" align="center" prop="postName"/>
-      <el-table-column label="发票号码" align="center" prop="postSort">
+      <el-table-column label="序号" align="center" prop="postId" min-width="50" v-if="columns[0].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票状态" align="center" prop="postId1" v-if="columns[1].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="开票日期" align="center" prop="postCode" v-if="columns[2].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票代码" align="center" prop="postName" v-if="columns[3].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票号码" align="center" prop="postSort" v-if="columns[4].visible" :show-overflow-tooltip="true">
         <template #default="scope">
           <span class="link-type" @click="getInvoiceImg(scope.row)">{{ scope.row.postName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="销售方名称" align="center" min-width="120" prop="postSort2"/>
-      <el-table-column label="不含税金额" align="center" min-width="100" prop="postSort3"/>
-      <el-table-column label="税额合计" align="center" prop="postSort4"/>
-      <el-table-column label="价税合计" align="center" prop="postSort5"/>
-      <el-table-column label="发票验真" align="center" prop="postSort6"/>
-      <el-table-column label="购买方名称" align="center" min-width="120" prop="postSort7"/>
-      <el-table-column label="发票来源" align="center" prop="postSort8"/>
-      <el-table-column label="发票上传时间" align="center" prop="createTime" min-width="180">
+      <el-table-column label="销售方名称" align="center" min-width="120" prop="postSort2" v-if="columns[5].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="不含税金额" align="center" min-width="100" prop="postSort3" v-if="columns[6].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="税额合计" align="center" prop="postSort4" v-if="columns[7].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="价税合计" align="center" prop="postSort5" v-if="columns[8].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票验真" align="center" prop="postSort6" v-if="columns[9].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="购买方名称" align="center" min-width="120" prop="postSort7" v-if="columns[10].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票来源" align="center" prop="postSort8" v-if="columns[11].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="发票上传时间" align="center" prop="createTime" min-width="180" v-if="columns[12].visible" :show-overflow-tooltip="true">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="发票种类" align="center" prop="status">
+      <el-table-column label="发票种类" align="center" prop="status" v-if="columns[13].visible" :show-overflow-tooltip="true">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="发票类型" align="center" prop="status1">
+      <el-table-column label="发票类型" align="center" prop="status1" v-if="columns[14].visible" :show-overflow-tooltip="true">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="修改人" align="center" prop="postSort8"/>
-      <el-table-column label="修改时间" align="center" prop="createTime" min-width="180">
+      <el-table-column label="修改人" align="center" prop="postSort8" v-if="columns[15].visible" :show-overflow-tooltip="true"/>
+      <el-table-column label="修改时间" align="center" prop="createTime" min-width="180" v-if="columns[16].visible" :show-overflow-tooltip="true">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
@@ -264,17 +264,26 @@ const editRef = ref(undefined)
 const detailRef = ref(undefined)
 const imgRef = ref(undefined)
 const invoiceImgVisible = ref(false)
-const tabValue = ref('1')
 
 // 列显隐信息
 const columns = ref([
-  { key: 0, label: `用户编号`, visible: true },
-  { key: 1, label: `用户名称`, visible: true },
-  { key: 2, label: `用户昵称`, visible: true },
-  { key: 3, label: `部门`, visible: true },
-  { key: 4, label: `手机号码`, visible: true },
-  { key: 5, label: `状态`, visible: true },
-  { key: 6, label: `创建时间`, visible: true }
+  { key: 0, label: `序号`, visible: true },
+  { key: 1, label: `发票状态`, visible: true },
+  { key: 2, label: `开票日期`, visible: true },
+  { key: 3, label: `发票代码`, visible: true },
+  { key: 4, label: `发票号码`, visible: true },
+  { key: 5, label: `销售方名称`, visible: true },
+  { key: 6, label: `不含税金额`, visible: true },
+  { key: 7, label: `税额合计`, visible: true },
+  { key: 8, label: `价税合计`, visible: true },
+  { key: 9, label: `发票验真`, visible: true },
+  { key: 10, label: `购买方名称`, visible: true },
+  { key: 11, label: `发票来源`, visible: true },
+  { key: 12, label: `发票上传时间`, visible: true },
+  { key: 13, label: `发票种类`, visible: true },
+  { key: 14, label: `发票类型`, visible: true },
+  { key: 15, label: `修改人`, visible: true },
+  { key: 16, label: `修改时间`, visible: true },
 ]);
 
 
@@ -286,7 +295,8 @@ const data = reactive({
     postCode: undefined,
     postName: undefined,
     dateRange: [],
-    status: undefined
+    status: undefined,
+    tabValue: '1',
   },
   rules: {
     postName: [{required: true, message: "岗位名称不能为空", trigger: "blur"}],
